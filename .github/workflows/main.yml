@@ -19,17 +19,11 @@ jobs:
 
       - name: 필요한 패키지 설치
         run: pip install google-api-python-client
-              pip install google-auth google-auth-oauthlib google-auth-httplib2
-
-      - name: 서비스 계정 JSON 생성
-        run: echo '${{ secrets.GOOGLE_CREDENTIALS }}' > service-account.json
-
-      - name: 환경 변수 설정
-        run: echo "GOOGLE_APPLICATION_CREDENTIALS=service-account.json" >> $GITHUB_ENV
 
       - name: 인기 급상승 동영상 업데이트 실행      
-        run: 
-          python ytcrawler.py
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}  # GitHub Secrets에서 불러오기
+        run: python ytcrawler.py
 
       - name: 현재 디렉토리 파일 목록 출력 (디버깅용)
         run: ls -R
@@ -48,7 +42,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git pull origin main --rebase --autostash  # 충돌 방지
           git add data/trending_videos.json
           git commit -m "🔄 자동 업데이트: 최신 유튜브 인기 영상 리스트" || echo "No changes to commit"
-          git pull --rebase  # 원격 저장소의 최신 변경 사항을 가져옴
           git push origin main
