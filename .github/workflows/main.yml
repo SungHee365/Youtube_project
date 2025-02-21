@@ -3,7 +3,7 @@ name: Update Trending Videos
 on:
   schedule:
     - cron: "0 * * * *"  # 매 정각(1시간 간격) 실행
-  workflow_dispatch:  # 수동 실행 가능
+    workflow_dispatch:  # 수동 실행 가능
 
 jobs:
   update:
