@@ -5,16 +5,10 @@ import os
 
 
 # YouTube API를 사용하기 위해 필요한 API_KEY를 지정합니다.
+#API_KEY = "AIzaSyADXDdjc_bmydWeug0CpDVgc34DEnZeNB4" 
 API_KEY = os.getenv("YOUTUBE_API_KEY")
-credentials_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-
-if not credentials_path:
-    raise ValueError("GOOGLE_APPLICATION_CREDENTIALS 환경 변수가 설정되지 않았습니다!")
-
-# 서비스 계정 인증 설정
-credentials = service_account.Credentials.from_service_account_file(credentials_path)
-youtube = build("youtube", "v3", credentials=credentials)
-
+if not API_KEY:
+    raise ValueError("환경 변수 YOUTUBE_API_KEY가 설정되지 않았습니다!")
 
 # build() 함수는 Google API 클라이언트를 설정하는 부분입니다.
 # youtube.v3 API 버전과 제공된 API_KEY를 사용해 클라이언트를 만듭니다.
@@ -43,7 +37,7 @@ def convert_duration(iso_duration):
 # 영상의 id, title, channelTitle, duration, viewCount, thumbnail_url 등의 정보를 수집하고,
 # 이를 리스트로 반환합니다.
 
-def get_trending_videos(region_code="KR", max_results=10):
+def get_trending_videos(region_code="KR", max_results=20):
     request = youtube.videos().list(
         part="id,snippet,contentDetails,statistics",
         chart="mostPopular",
@@ -60,7 +54,8 @@ def get_trending_videos(region_code="KR", max_results=10):
             "channel_name": item["snippet"]["channelTitle"],
             "duration": convert_duration(item["contentDetails"]["duration"]),  # 변환된 형식 적용
             "view_count": item["statistics"].get("viewCount", "0"),
-            "thumbnail_url": item["snippet"]["thumbnails"]["high"]["url"]
+            "thumbnail_url": item["snippet"]["thumbnails"]["high"]["url"],
+            "upload_time" : item["snippet"]["publishedAt"]
         }
         videos.append(video_data)
 
@@ -68,7 +63,7 @@ def get_trending_videos(region_code="KR", max_results=10):
 
 
 
-SAVE_DIR = "templates"
+SAVE_DIR = "data"
 os.makedirs(SAVE_DIR, exist_ok=True)  # 폴더가 없으면 생성
 SAVE_PATH = os.path.join(SAVE_DIR, "trending_videos.json")  # 최종 파일 경로
 
