@@ -52,7 +52,7 @@ def get_trending_videos(region_code="KR", max_results=20):
             "duration": convert_duration(item["contentDetails"]["duration"]),  # 변환된 형식 적용
             "view_count": item["statistics"].get("viewCount", "0"),
             "thumbnail_url": item["snippet"]["thumbnails"]["high"]["url"],
-            "upload_time" : item["snippet"]["publishedAt"]
+            "upload_time" : convert_duration(item["snippet"]["publishedAt"])
         }
         videos.append(video_data)
 
