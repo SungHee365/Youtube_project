@@ -34,7 +34,7 @@ def convert_duration(iso_duration):
 # 영상의 id, title, channelTitle, duration, viewCount, thumbnail_url 등의 정보를 수집하고,
 # 이를 리스트로 반환합니다.
 
-def get_trending_videos(region_code="KR", max_results=20):
+def get_trending_videos(region_code="KR", max_results=42):
     request = youtube.videos().list(
         part="id,snippet,contentDetails,statistics",
         chart="mostPopular",
