@@ -1,6 +1,4 @@
 name: Update Trending Videos
-env:
-  YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
 on:
   schedule:
     - cron: "0 * * * *"  # 매 정각(1시간 간격) 실행
