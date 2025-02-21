@@ -5,7 +5,7 @@ import os
 
 
 # YouTube API를 사용하기 위해 필요한 API_KEY를 지정합니다.
-API_KEY = "API_KEY"
+API_KEY = os.getenv("YOUTUBE_API_KEY")
 
 
 # build() 함수는 Google API 클라이언트를 설정하는 부분입니다.
