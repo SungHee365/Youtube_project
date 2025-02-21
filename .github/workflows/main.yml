@@ -1,6 +1,4 @@
 name: Update Trending Videos
-env:
-  YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
 on:
   schedule:
     - cron: "0 * * * *"  # 매 정각(1시간 간격) 실행
@@ -22,7 +20,13 @@ jobs:
       - name: 필요한 패키지 설치
         run: pip install google-api-python-client
 
-      - name: 인기 급상승 동영상 업데이트 실행
+      - name: 서비스 계정 JSON 생성
+        run: echo '${{ secrets.GOOGLE_CREDENTIALS }}' > service-account.json
+
+      - name: 환경 변수 설정
+        run: echo "GOOGLE_APPLICATION_CREDENTIALS=service-account.json" >> $GITHUB_ENV
+
+      - name: 인기 급상승 동영상 업데이트 실행      
         run: 
           python ytcrawler.py
 
