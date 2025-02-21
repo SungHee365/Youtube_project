@@ -5,8 +5,8 @@ import os
 
 
 # YouTube API를 사용하기 위해 필요한 API_KEY를 지정합니다.
-API_KEY = "AIzaSyADXDdjc_bmydWeug0CpDVgc34DEnZeNB4" 
-#API_KEY = os.getenv("YOUTUBE_API_KEY")
+#API_KEY = "AIzaSyADXDdjc_bmydWeug0CpDVgc34DEnZeNB4" 
+API_KEY = os.getenv("YOUTUBE_API_KEY")
 #if not API_KEY:
     #raise ValueError("환경 변수 YOUTUBE_API_KEY가 설정되지 않았습니다!")
 
