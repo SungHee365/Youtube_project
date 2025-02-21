@@ -5,10 +5,7 @@ import os
 
 
 # YouTube API를 사용하기 위해 필요한 API_KEY를 지정합니다.
-#API_KEY = "AIzaSyADXDdjc_bmydWeug0CpDVgc34DEnZeNB4" 
 API_KEY = os.getenv("YOUTUBE_API_KEY")
-#if not API_KEY:
-    #raise ValueError("환경 변수 YOUTUBE_API_KEY가 설정되지 않았습니다!")
 
 # build() 함수는 Google API 클라이언트를 설정하는 부분입니다.
 # youtube.v3 API 버전과 제공된 API_KEY를 사용해 클라이언트를 만듭니다.
