@@ -19,6 +19,7 @@ jobs:
 
       - name: 필요한 패키지 설치
         run: pip install google-api-python-client
+              pip install google-auth google-auth-oauthlib google-auth-httplib2
 
       - name: 서비스 계정 JSON 생성
         run: echo '${{ secrets.GOOGLE_CREDENTIALS }}' > service-account.json
