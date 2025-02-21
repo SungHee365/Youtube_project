@@ -6,6 +6,14 @@ import os
 
 # YouTube API를 사용하기 위해 필요한 API_KEY를 지정합니다.
 API_KEY = os.getenv("YOUTUBE_API_KEY")
+credentials_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+
+if not credentials_path:
+    raise ValueError("GOOGLE_APPLICATION_CREDENTIALS 환경 변수가 설정되지 않았습니다!")
+
+# 서비스 계정 인증 설정
+credentials = service_account.Credentials.from_service_account_file(credentials_path)
+youtube = build("youtube", "v3", credentials=credentials)
 
 
 # build() 함수는 Google API 클라이언트를 설정하는 부분입니다.
