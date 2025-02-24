@@ -45,9 +45,10 @@ def get_trending_videos(region_code="KR", max_results=42):
 
     videos = []
     for item in response.get("items", []):
+        video_id = item["id"]
         best_comment = get_best_comment(video_id)
         video_data = {
-            "video_id": item["id"],
+            "video_id": video_id,
             "title": item["snippet"]["title"],
             "channel_name": item["snippet"]["channelTitle"],
             "duration": convert_duration(item["contentDetails"]["duration"]),  # 변환된 형식 적용
