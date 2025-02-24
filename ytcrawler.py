@@ -58,6 +58,28 @@ def get_trending_videos(region_code="KR", max_results=42):
     return videos
 
 
+def get_best_comment(video_id):
+    try:
+        request = youtube.commentThreads().list(
+            part="snippet",
+            videoId=video_id,
+            maxResults=4,  # 상위 1개 댓글만 가져옴
+            order="relevance"  # 좋아요 순서로 정렬
+        )
+        response = request.execute() # Youtube API 요청을 실행하여 데이터를 받아냄냄
+
+        if response.get("items"):
+            top_comment = response["items"][0]["snippet"]["topLevelComment"]["snippet"]
+            return {
+                "text": top_comment["textDisplay"],  # 댓글 내용
+                "author": top_comment["authorDisplayName"],  # 작성자 이름
+                "like_count": top_comment["likeCount"]  # 좋아요 수
+            }
+    except Exception as e:
+        print(f"댓글 가져오는 중 오류 발생: {e}") # e라는 오류가 발생했음을 알림림
+        return None
+
+
 
 SAVE_DIR = "data"
 os.makedirs(SAVE_DIR, exist_ok=True)  # 폴더가 없으면 생성
