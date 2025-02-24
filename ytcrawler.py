@@ -85,7 +85,7 @@ def get_trending_videos(region_code="KR", max_results=10):
             "view_count": item["statistics"].get("viewCount", "0"),
             "thumbnail_url": item["snippet"]["thumbnails"]["high"]["url"],
             "upload_time": item["snippet"]["publishedAt"],
-            "best_comment": best_comments
+            "best_comments": best_comments
         }
         videos.append(video_data)
 
