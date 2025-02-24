@@ -46,7 +46,7 @@ def get_trending_videos(region_code="KR", max_results=42):
     videos = []
     for item in response.get("items", []):
         video_id = item["id"]
-        best_comments = get_best_comment(video_id, 4)
+        best_comments = get_best_comments(video_id, 4)
         video_data = {
             "video_id": video_id,
             "title": item["snippet"]["title"],
@@ -62,27 +62,31 @@ def get_trending_videos(region_code="KR", max_results=42):
     return videos
 
 
-def get_best_comment(video_id):
+def get_best_comments(video_id, max_comments=4):  # ✅ max_comments 추가
     try:
         request = youtube.commentThreads().list(
             part="snippet",
             videoId=video_id,
-            maxResults=4,  # 상위 4개 댓글만 가져옴
-            order="relevance"  # 좋아요 순서로 정렬
+            maxResults=4,  # ✅ 여러 개의 댓글을 가져오기 위해 max_comments 사용
+            order="relevance"
         )
-        response = request.execute()  # Youtube API에서 데이터를 받아냄냄
+        response = request.execute()
 
-        best_comment = response["items"][0]["snippet"]["topLevelComment"]["snippet"]
+        best_comments = [
+            {
+                "text": item["snippet"]["topLevelComment"]["snippet"]["textDisplay"],
+                "author": item["snippet"]["topLevelComment"]["snippet"]["authorDisplayName"],
+                "like_count": item["snippet"]["topLevelComment"]["snippet"]["likeCount"]
+            }
+            for item in response.get("items", [])  # ✅ 여러 개의 댓글을 리스트에 저장
+        ]
 
-        return {  # best_comment 반환
-            "text": best_comment["textDisplay"],
-            "author": best_comment["authorDisplayName"],
-            "like_count": best_comment["likeCount"]
-        }
+        return best_comments  # ✅ 여러 개의 댓글을 리스트로 반환
 
     except Exception as e:
         print(f" 댓글 가져오는 중 오류 발생: {e}")
-        return None  # 오류 발생 시 None 반환
+        return []  # ✅ 오류 발생 시 빈 리스트 반환
+
 
 
 
