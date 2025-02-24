@@ -25,7 +25,7 @@ def get_best_comment(video_id):
         request = youtube.commentThreads().list(
             part="snippet",
             videoId=video_id,
-            maxResults=1,  # 가장 좋아요가 많은 댓글 1개 가져오기
+            maxResults=4, 
             order="relevance"
         )
         response = request.execute()
