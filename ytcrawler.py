@@ -52,6 +52,8 @@ def get_trending_videos(region_code="KR", max_results=42):
             "duration": convert_duration(item["contentDetails"]["duration"]),  # 변환된 형식 적용
             "view_count": item["statistics"].get("viewCount", "0"),
             "thumbnail_url": item["snippet"]["thumbnails"]["high"]["url"],
+            "upload_time" : item["snippet"]["publishedAt"], # 업로드 시간간간
+            "best_comment": best_comment # best 댓글 저장장
         }
         videos.append(video_data)
 
@@ -68,16 +70,7 @@ def get_best_comment(video_id):
         )
         response = request.execute() # Youtube API 요청을 실행하여 데이터를 받아냄냄
 
-        if response.get("items"):
-            top_comment = response["items"][0]["snippet"]["topLevelComment"]["snippet"]
-            return {
-                "text": top_comment["textDisplay"],  # 댓글 내용
-                "author": top_comment["authorDisplayName"],  # 작성자 이름
-                "like_count": top_comment["likeCount"]  # 좋아요 수
-            }
-    except Exception as e:
-        print(f"댓글 가져오는 중 오류 발생: {e}") # e라는 오류가 발생했음을 알림림
-        return None
+        best_comment = response["items"][0]["snippet"]["topLevelComment"]["snippet"]
 
 
 
