@@ -19,7 +19,7 @@ def convert_duration(iso_duration):
 
     return f"{hours}:{minutes:02}:{seconds:02}" if hours > 0 else f"{minutes}:{seconds:02}"
 
-# 🎯 베스트 댓글 가져오는 함수
+# 베스트 댓글 가져오는 함수
 def get_best_comment(video_id):
     try:
         request = youtube.commentThreads().list(
@@ -39,10 +39,22 @@ def get_best_comment(video_id):
         }
 
     except Exception as e:
-        print(f"❌ 댓글 가져오는 중 오류 발생: {e}")
+        print(f"댓글 가져오는 중 오류 발생: {e}")
         return None  # 오류 발생 시 None 반환
 
-# 🎥 트렌딩 영상 가져오는 함수 (베스트 댓글 포함)
+
+#카테고리 가져오는 함수
+def get_video_categories(region_code="KR"):
+    request = youtube.videoCategories().list(
+        part="snippet",
+        regionCode=region_code
+    )
+    response = request.execute()
+
+    category_map = {item["id"]: item["snippet"]["title"] for item in response.get("items", [])}
+    return category_map
+
+#  영상 가져오는 함수 (베스트 댓글 포함)
 def get_trending_videos(region_code="KR", max_results=10):
     request = youtube.videos().list(
         part="id,snippet,contentDetails,statistics",
@@ -75,7 +87,7 @@ def get_trending_videos(region_code="KR", max_results=10):
 
     return videos
 
-# 📂 JSON 파일 저장
+#  JSON 파일 저장
 SAVE_DIR = "data"
 os.makedirs(SAVE_DIR, exist_ok=True)
 SAVE_PATH = os.path.join(SAVE_DIR, "trending_videos.json")
@@ -85,4 +97,4 @@ trending_videos = get_trending_videos()
 with open(SAVE_PATH, "w", encoding="utf-8") as file:
     json.dump(trending_videos, file, ensure_ascii=False, indent=4)
 
-print(f"✅ 데이터 저장 완료: {SAVE_PATH}")
+print(f" 데이터 저장 완료: {SAVE_PATH}")
