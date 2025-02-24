@@ -56,6 +56,7 @@ def get_video_categories(region_code="KR"):
 
 #  영상 가져오는 함수 (베스트 댓글 포함)
 def get_trending_videos(region_code="KR", max_results=10):
+    category_map = get_video_categories(region_code)
     request = youtube.videos().list(
         part="id,snippet,contentDetails,statistics",
         chart="mostPopular",
