@@ -19,32 +19,6 @@ def convert_duration(iso_duration):
 
     return f"{hours}:{minutes:02}:{seconds:02}" if hours > 0 else f"{minutes}:{seconds:02}"
 
-def get_best_comments(video_id, max_comments=4):
-    try:
-        request = youtube.commentThreads().list(
-            part="snippet",
-            videoId=video_id,
-            maxResults=max_comments,  # 여러 개의 댓글 가져오기
-            order="relevance"
-        )
-        response = request.execute()
-
-        # 여러 개의 댓글을 리스트로 저장
-        best_comments = [
-            {
-                "text": item["snippet"]["topLevelComment"]["snippet"]["textDisplay"],
-                "author": item["snippet"]["topLevelComment"]["snippet"]["authorDisplayName"],
-                "like_count": item["snippet"]["topLevelComment"]["snippet"]["likeCount"]
-            }
-            for item in response.get("items", [])  # 모든 댓글 가져오기
-        ]
-
-        return best_comments  # 여러 개의 댓글 반환
-
-    except Exception as e:
-        print(f"❌ 댓글 가져오는 중 오류 발생: {e}")
-        return []  # 오류 발생 시 빈 리스트 반환
-
 
 
 #카테고리 가져오는 함수
@@ -72,7 +46,7 @@ def get_trending_videos(region_code="KR", max_results=42):
     videos = []
     for item in response.get("items", []):
         video_id = item["id"]
-        best_comments = get_best_comments(video_id)  # 베스트 댓글 추가
+        
         category_id = item["snippet"].get("categoryId", "0")
         category_name = category_map.get(category_id, "알 수 없음")  #카테고리 이름 가져오기
 
@@ -85,7 +59,7 @@ def get_trending_videos(region_code="KR", max_results=42):
             "view_count": item["statistics"].get("viewCount", "0"),
             "thumbnail_url": item["snippet"]["thumbnails"]["high"]["url"],
             "upload_time": item["snippet"]["publishedAt"],
-            "best_comments": best_comments
+            
         }
         videos.append(video_data)
 
