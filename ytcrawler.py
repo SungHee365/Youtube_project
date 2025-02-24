@@ -20,23 +20,30 @@ def convert_duration(iso_duration):
     return f"{hours}:{minutes:02}:{seconds:02}" if hours > 0 else f"{minutes}:{seconds:02}"
 
 # 베스트 댓글 가져오는 함수
-def get_best_comment(video_id):
+def get_best_comments(video_id, max_comments=4):  #  max_comments 추가
     try:
         request = youtube.commentThreads().list(
             part="snippet",
             videoId=video_id,
-            maxResults=1,  # 가장 좋아요가 많은 댓글 1개 가져오기
+            maxResults=max_comments,  #  여러 개의 댓글을 가져오기 위해 max_comments 사용
             order="relevance"
         )
         response = request.execute()
 
-        best_comment = response["items"][0]["snippet"]["topLevelComment"]["snippet"]
+        best_comments = [
+            {
+                "text": item["snippet"]["topLevelComment"]["snippet"]["textDisplay"],
+                "author": item["snippet"]["topLevelComment"]["snippet"]["authorDisplayName"],
+                "like_count": item["snippet"]["topLevelComment"]["snippet"]["likeCount"]
+            }
+            for item in response.get("items", [])  #  여러 개의 댓글을 리스트에 저장
+        ]
 
-        return {
-            "text": best_comment["textDisplay"],
-            "author": best_comment["authorDisplayName"],
-            "like_count": best_comment["likeCount"]
-        }
+        return best_comments  # 여러 개의 댓글을 리스트로 반환
+
+    except Exception as e:
+        print(f" 댓글 가져오는 중 오류 발생: {e}")
+        return []  # 오류 발생 시 빈 리스트 반환
 
     except Exception as e:
         print(f"댓글 가져오는 중 오류 발생: {e}")
@@ -82,7 +89,7 @@ def get_trending_videos(region_code="KR", max_results=10):
             "view_count": item["statistics"].get("viewCount", "0"),
             "thumbnail_url": item["snippet"]["thumbnails"]["high"]["url"],
             "upload_time": item["snippet"]["publishedAt"],
-            "best_comment": best_comment 
+            "best_comment": best_comments 
         }
         videos.append(video_data)
 
