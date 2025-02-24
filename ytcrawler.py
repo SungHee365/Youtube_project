@@ -55,7 +55,7 @@ def get_trending_videos(region_code="KR", max_results=42):
             "view_count": item["statistics"].get("viewCount", "0"),
             "thumbnail_url": item["snippet"]["thumbnails"]["high"]["url"],
             "upload_time" : item["snippet"]["publishedAt"], # 업로드 시간간간
-            "best_comment": best_comment # best 댓글 저장장
+            "best_comments": best_comments # best 댓글 저장장
         }
         videos.append(video_data)
 
