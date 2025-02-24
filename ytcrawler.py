@@ -45,6 +45,7 @@ def get_trending_videos(region_code="KR", max_results=42):
 
     videos = []
     for item in response.get("items", []):
+        best_comment = get_best_comment(video_id)
         video_data = {
             "video_id": item["id"],
             "title": item["snippet"]["title"],
@@ -65,12 +66,22 @@ def get_best_comment(video_id):
         request = youtube.commentThreads().list(
             part="snippet",
             videoId=video_id,
-            maxResults=4,  # 상위 1개 댓글만 가져옴
+            maxResults=4,  # 상위 4개 댓글만 가져옴
             order="relevance"  # 좋아요 순서로 정렬
         )
-        response = request.execute() # Youtube API 요청을 실행하여 데이터를 받아냄냄
+        response = request.execute()  # Youtube API에서 데이터를 받아냄냄
 
         best_comment = response["items"][0]["snippet"]["topLevelComment"]["snippet"]
+
+        return {  # ✅ best_comment 반환
+            "text": best_comment["textDisplay"],
+            "author": best_comment["authorDisplayName"],
+            "like_count": best_comment["likeCount"]
+        }
+
+    except Exception as e:
+        print(f"❌ 댓글 가져오는 중 오류 발생: {e}")
+        return None  # 오류 발생 시 None 반환
 
 
 
