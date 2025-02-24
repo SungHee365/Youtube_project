@@ -46,7 +46,7 @@ def get_trending_videos(region_code="KR", max_results=42):
     videos = []
     for item in response.get("items", []):
         video_id = item["id"]
-        best_comments = get_best_comments(video_id, 4)
+        best_comments = get_best_comment(video_id, 4)
         video_data = {
             "video_id": video_id,
             "title": item["snippet"]["title"],
