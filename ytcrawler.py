@@ -4,8 +4,7 @@ import re
 import os
 
 # YouTube API 키 가져오기
-API_KEY = AIzaSyADXDdjc_bmydWeug0CpDVgc34DEnZeNB4
-
+API_KEY = os.getenv("OPENYOUTUBE_API_KEY")
 # YouTube API 클라이언트 설정
 youtube = build("youtube", "v3", developerKey=API_KEY)
 
