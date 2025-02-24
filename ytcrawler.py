@@ -73,14 +73,14 @@ def get_best_comment(video_id):
 
         best_comment = response["items"][0]["snippet"]["topLevelComment"]["snippet"]
 
-        return {  # ✅ best_comment 반환
+        return {  # best_comment 반환
             "text": best_comment["textDisplay"],
             "author": best_comment["authorDisplayName"],
             "like_count": best_comment["likeCount"]
         }
 
     except Exception as e:
-        print(f"❌ 댓글 가져오는 중 오류 발생: {e}")
+        print(f" 댓글 가져오는 중 오류 발생: {e}")
         return None  # 오류 발생 시 None 반환
 
 
