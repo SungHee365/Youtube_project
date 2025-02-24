@@ -72,7 +72,7 @@ def get_trending_videos(region_code="KR", max_results=10):
     videos = []
     for item in response.get("items", []):
         video_id = item["id"]
-        best_comment = get_best_comments(video_id)  # 베스트 댓글 추가
+        best_comments = get_best_comments(video_id)  # 베스트 댓글 추가
         category_id = item["snippet"].get("categoryId", "0")
         category_name = category_map.get(category_id, "알 수 없음")  #카테고리 이름 가져오기
 
