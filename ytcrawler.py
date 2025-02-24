@@ -3,20 +3,13 @@ import json
 import re
 import os
 
+# YouTube API 키 가져오기
+API_KEY = AIzaSyADXDdjc_bmydWeug0CpDVgc34DEnZeNB4
 
-# YouTube API를 사용하기 위해 필요한 API_KEY를 지정합니다.
-API_KEY = os.getenv("YOUTUBE_API_KEY")
-
-# build() 함수는 Google API 클라이언트를 설정하는 부분입니다.
-# youtube.v3 API 버전과 제공된 API_KEY를 사용해 클라이언트를 만듭니다.
+# YouTube API 클라이언트 설정
 youtube = build("youtube", "v3", developerKey=API_KEY)
 
-
-# iso_duration는 ISO 8601 형식으로 된 시간 정보를 받습니다.
-# 예: PT1H2M10S (1시간 2분 10초)
-#이 함수는 이 형식을 "시간:분:초" 형태로 변환합니다.
-#예: 1:02:10 또는 2:10 (시간이 없으면 분과 초만 출력).
-
+# ISO 8601 형식의 시간을 "시간:분:초"로 변환하는 함수
 def convert_duration(iso_duration):
     pattern = re.compile(r'PT(\d+H)?(\d+M)?(\d+S)?')
     matches = pattern.match(iso_duration)
@@ -27,14 +20,31 @@ def convert_duration(iso_duration):
 
     return f"{hours}:{minutes:02}:{seconds:02}" if hours > 0 else f"{minutes}:{seconds:02}"
 
+# 🎯 베스트 댓글 가져오는 함수
+def get_best_comment(video_id):
+    try:
+        request = youtube.commentThreads().list(
+            part="snippet",
+            videoId=video_id,
+            maxResults=1,  # 가장 좋아요가 많은 댓글 1개 가져오기
+            order="relevance"
+        )
+        response = request.execute()
 
+        best_comment = response["items"][0]["snippet"]["topLevelComment"]["snippet"]
 
-# get_trending_videos() 함수는 YouTube API를 통해 트렌딩 영상을 가져옵니다.
-# 기본적으로 한국(region_code="KR")에서 인기 영상 10개(max_results=10)를 가져옵니다.
-# 영상의 id, title, channelTitle, duration, viewCount, thumbnail_url 등의 정보를 수집하고,
-# 이를 리스트로 반환합니다.
+        return {
+            "text": best_comment["textDisplay"],
+            "author": best_comment["authorDisplayName"],
+            "like_count": best_comment["likeCount"]
+        }
 
-def get_trending_videos(region_code="KR", max_results=42):
+    except Exception as e:
+        print(f"❌ 댓글 가져오는 중 오류 발생: {e}")
+        return None  # 오류 발생 시 None 반환
+
+# 🎥 트렌딩 영상 가져오는 함수 (베스트 댓글 포함)
+def get_trending_videos(region_code="KR", max_results=10):
     request = youtube.videos().list(
         part="id,snippet,contentDetails,statistics",
         chart="mostPopular",
@@ -46,57 +56,34 @@ def get_trending_videos(region_code="KR", max_results=42):
     videos = []
     for item in response.get("items", []):
         video_id = item["id"]
-        best_comments = get_best_comments(video_id, 4)
+        best_comment = get_best_comment(video_id)  # 베스트 댓글 추가
+        category_id = item["snippet"].get("categoryId", "0")
+        category_name = category_map.get(category_id, "알 수 없음")  #카테고리 이름 가져오기
+
+
         video_data = {
             "video_id": video_id,
             "title": item["snippet"]["title"],
             "channel_name": item["snippet"]["channelTitle"],
-            "duration": convert_duration(item["contentDetails"]["duration"]),  # 변환된 형식 적용
+            "category": category_name,
+            "duration": convert_duration(item["contentDetails"]["duration"]),
             "view_count": item["statistics"].get("viewCount", "0"),
             "thumbnail_url": item["snippet"]["thumbnails"]["high"]["url"],
-            "upload_time" : item["snippet"]["publishedAt"], # 업로드 시간간간
-            "best_comments": best_comments # best 댓글 저장장
+            "upload_time": item["snippet"]["publishedAt"],
+            "best_comment": best_comment 
         }
         videos.append(video_data)
 
     return videos
 
-
-def get_best_comments(video_id, max_comments=4):  # ✅ max_comments 추가
-    try:
-        request = youtube.commentThreads().list(
-            part="snippet",
-            videoId=video_id,
-            maxResults=4,  # ✅ 여러 개의 댓글을 가져오기 위해 max_comments 사용
-            order="relevance"
-        )
-        response = request.execute()
-
-        best_comments = [
-            {
-                "text": item["snippet"]["topLevelComment"]["snippet"]["textDisplay"],
-                "author": item["snippet"]["topLevelComment"]["snippet"]["authorDisplayName"],
-                "like_count": item["snippet"]["topLevelComment"]["snippet"]["likeCount"]
-            }
-            for item in response.get("items", [])  # ✅ 여러 개의 댓글을 리스트에 저장
-        ]
-
-        return best_comments  # ✅ 여러 개의 댓글을 리스트로 반환
-
-    except Exception as e:
-        print(f" 댓글 가져오는 중 오류 발생: {e}")
-        return []  # ✅ 오류 발생 시 빈 리스트 반환
-
-
-
-
+# 📂 JSON 파일 저장
 SAVE_DIR = "data"
-os.makedirs(SAVE_DIR, exist_ok=True)  # 폴더가 없으면 생성
-SAVE_PATH = os.path.join(SAVE_DIR, "trending_videos.json")  # 최종 파일 경로
+os.makedirs(SAVE_DIR, exist_ok=True)
+SAVE_PATH = os.path.join(SAVE_DIR, "trending_videos.json")
 
 trending_videos = get_trending_videos()
 
 with open(SAVE_PATH, "w", encoding="utf-8") as file:
     json.dump(trending_videos, file, ensure_ascii=False, indent=4)
 
-print(f"데이터 저장 완료: {SAVE_PATH}")
+print(f"✅ 데이터 저장 완료: {SAVE_PATH}")
