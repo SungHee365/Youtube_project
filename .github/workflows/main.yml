@@ -18,10 +18,12 @@ jobs:
           python-version: "3.9"
 
       - name: 필요한 패키지 설치
-        run: |
-        pip install google-api-python-client
-        pip install pytz
+        run: pip install google-api-python-client
+        
+      - name: 필요한 패키지 설치
+        run: pip install pytz
 
+        
       - name: 인기 급상승 동영상 업데이트 실행      
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}  # GitHub Secrets에서 불러오기
