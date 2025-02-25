@@ -19,6 +19,7 @@ jobs:
 
       - name: 필요한 패키지 설치
         run: pip install google-api-python-client
+        run: pip install pytz
 
       - name: 인기 급상승 동영상 업데이트 실행      
         env:
